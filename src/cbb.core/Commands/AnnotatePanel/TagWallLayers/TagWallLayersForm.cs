@@ -66,8 +66,9 @@ namespace cbb.core
                 SaveOnClose = false
             };
             //ComboBox列表项
-            formSettings.SettingCollectors.Add(new PropertySettingCollector(
-                this, typeof(System.Windows.Forms.ComboBox), "SelectedIndex"));
+            formSettings.SettingCollectors
+                .Add(new PropertySettingCollector(this, typeof(System.Windows.Forms.ComboBox),
+                "SelectedIndex"));
 
             //所有的CheckBox控件保存到配置文件中
             formSettings.SettingCollectors.Add(new PropertySettingCollector(this,
@@ -210,11 +211,10 @@ namespace cbb.core
             //cmbUnitType.DataSource = Enum.GetValues(typeof(LengthUnitType));
 
             var list = new List<KeyValuePair<string, LengthUnitType>>();
-            foreach (LengthUnitType item in (LengthUnitType[])Enum.GetValues(typeof(LengthUnitType)))
+            foreach (LengthUnitType lengthUnitType in (LengthUnitType[])Enum.GetValues(typeof(LengthUnitType)))
             {
-                list.Add(new KeyValuePair<string, LengthUnitType>
-                    (item.GetAttributeOfType<DescriptionAttribute>().Description,
-                    item));
+                var description = lengthUnitType.GetAttributeOfType<DescriptionAttribute>().Description;
+                list.Add(new KeyValuePair<string, LengthUnitType>(description, lengthUnitType));
             }
 
             cmbUnitType.DataSource = new BindingSource(list, null);

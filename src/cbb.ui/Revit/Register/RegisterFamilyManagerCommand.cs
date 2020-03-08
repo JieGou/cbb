@@ -1,11 +1,9 @@
 ﻿namespace cbb.ui
 {
-    using System.Windows;
-
-    using Autodesk.Revit.UI;
     using Autodesk.Revit.DB;
-
+    using Autodesk.Revit.UI;
     using core;
+    using System.Windows;
 
     /// <summary>
     /// Register Family Manager in zero state document.
@@ -13,21 +11,21 @@
     /// <seealso cref="Autodesk.Revit.UI.IExternalCommand" />
     [Autodesk.Revit.Attributes.Transaction(Autodesk.Revit.Attributes.TransactionMode.Manual)]
     [Autodesk.Revit.Attributes.Regeneration(Autodesk.Revit.Attributes.RegenerationOption.Manual)]
-    public class RegisterFamilyManagerCommand : IExternalCommand
+    public class RegisterFamilyManagerCommand /*: IExternalCommand*/
     {
         #region public methods
 
-        /// <summary>
-        /// Executes the specified command data.
-        /// </summary>
-        /// <param name="commandData">The command data.</param>
-        /// <param name="message">The message.</param>
-        /// <param name="elements">The elements.</param>
-        /// <returns></returns>
-        public Result Execute(ExternalCommandData commandData, ref string message, ElementSet elements)
-        {
-            return Execute(commandData.Application);
-        }
+        ///// <summary>
+        ///// Executes the specified command data.
+        ///// </summary>
+        ///// <param name="commandData">The command data.</param>
+        ///// <param name="message">The message.</param>
+        ///// <param name="elements">The elements.</param>
+        ///// <returns></returns>
+        //public Result Execute(ExternalCommandData commandData, ref string message, ElementSet elements)
+        //{
+        //    return Execute(commandData.Application);
+        //}
 
         /// <summary>
         /// Register dockable pane.
@@ -55,6 +53,6 @@
             return Result.Succeeded;
         }
 
-        #endregion
+        #endregion public methods
     }
 }
