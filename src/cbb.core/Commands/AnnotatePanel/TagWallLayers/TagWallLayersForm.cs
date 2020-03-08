@@ -1,11 +1,10 @@
 ﻿namespace cbb.core
 {
-    using System;
-    using System.Windows.Forms;
-    using System.Collections.Generic;
-
-    using Autodesk.Revit.UI;
     using Autodesk.Revit.DB;
+    using Autodesk.Revit.UI;
+    using System;
+    using System.Collections.Generic;
+    using System.Windows.Forms;
 
     /// <summary>
     /// Tag wall layer data aquisition form.
@@ -35,7 +34,7 @@
         /// </summary>
         private int decimals = 1;
 
-        #endregion
+        #endregion private members
 
         #region constructor
 
@@ -50,7 +49,7 @@
             uidoc = uIDocument;
         }
 
-        #endregion
+        #endregion constructor
 
         #region events
 
@@ -119,7 +118,7 @@
             decimals = (int)cmbDecimalPlaces.SelectedValue;
         }
 
-        #endregion
+        #endregion events
 
         #region public methods
 
@@ -143,7 +142,7 @@
             return information;
         }
 
-        #endregion
+        #endregion public methods
 
         #region private methods
 
@@ -155,12 +154,15 @@
             var doc = uidoc.Document;
 
             // Get all Text Element Types in project.
-            var allTextElementTypes = new FilteredElementCollector(doc).OfClass(typeof(TextElementType));
+            FilteredElementCollector allTextElementTypes = new FilteredElementCollector(doc)
+                .OfClass(typeof(TextElementType));
 
             var list = new List<KeyValuePair<string, ElementId>>();
 
             foreach (var item in allTextElementTypes)
+            {
                 list.Add(new KeyValuePair<string, ElementId>(item.Name, item.Id));
+            }
 
             cmbTextNoteElementType.DataSource = null;
             cmbTextNoteElementType.DataSource = new BindingSource(list, null);
@@ -196,6 +198,6 @@
             cmbDecimalPlaces.SelectedItem = values[2];
         }
 
-        #endregion
+        #endregion private methods
     }
 }

@@ -1,11 +1,12 @@
-﻿namespace cbb.core
+﻿using System;
+
+namespace cbb.core
 {
+    using Autodesk.Revit.DB;
+    using Autodesk.Revit.UI;
+    using Autodesk.Revit.UI.Selection;
     using System.Text;
     using System.Windows.Forms;
-
-    using Autodesk.Revit.UI;
-    using Autodesk.Revit.DB;
-    using Autodesk.Revit.UI.Selection;
 
     /// <summary>
     /// Command code to be executed when button is clicked.
@@ -46,18 +47,11 @@
             switch (activeView.ViewType)
             {
                 case ViewType.FloorPlan:
-                    canCreateTextNoteInView = true;
-                    break;
                 case ViewType.CeilingPlan:
-                    canCreateTextNoteInView = true;
-                    break;
                 case ViewType.Detail:
-                    canCreateTextNoteInView = true;
-                    break;
                 case ViewType.Elevation:
-                    canCreateTextNoteInView = true;
-                    break;
                 case ViewType.Section:
+                case ViewType.EngineeringPlan:
                     canCreateTextNoteInView = true;
                     break;
             }
@@ -71,96 +65,120 @@
                 return Result.Cancelled;
             }
 
-            // Get user provided information from window and show dialog.
-            using (var window = new TagWallLayersForm(uidoc))
+            try
             {
-                window.ShowDialog();
+                // Get user provided information from window and show dialog.
+                using (var window = new TagWallLayersForm(uidoc))
+                {
+                    window.ShowDialog();
 
-                if (window.DialogResult == DialogResult.Cancel)
+                    if (window.DialogResult == DialogResult.Cancel)
+                    {
+                        return Result.Cancelled;
+                    }
+
+                    userInfo = window.GetInformation();
+                }
+
+                // Ask user to select one basic wall.
+                var selectionReference = uidoc.Selection.PickObject(ObjectType.Element,
+                    //new SelectionFilterByCategory("Walls"),
+                    new SelectionFilterByCategory(BuiltInCategory.OST_Walls),
+                    "Select one basic wall.");
+                var selectionElement = doc.GetElement(selectionReference);
+
+                // Cast generic element type to more specific Wall type.
+                var wall = selectionElement as Wall;
+
+                // Check if wall is type of basic wall.
+                if (wall == null || wall.IsStackedWall)
+                {
+                    Message.Display("Wall you selected is category of the Stacked Wall.\nIt's not supported by this command.", WindowType.Warning);
                     return Result.Cancelled;
+                }
 
-                userInfo = window.GetInformation();
+                // Access list of wall layers.
+                var layers = wall.WallType.GetCompoundStructure().GetLayers();
+
+                // Get layer information in structured string format for Text Note.
+                var msg = new StringBuilder();
+
+                foreach (var layer in layers)
+                {
+                    var material = doc.GetElement(layer.MaterialId) as Material;
+
+                    msg.AppendLine();
+
+                    if (userInfo.Function)
+                    {
+                        msg.Append(layer.Function.ToString());
+                    }
+
+                    // Check if material is attached to the layer in wall compound structure.
+                    if (userInfo.Name)
+                    {
+                        if (material != null)
+                        {
+                            msg.Append(" " + material.Name);
+                        }
+                        else
+                        {
+                            msg.Append("  <by category>");
+                        }
+                    }
+
+                    // Convert units to metric.
+                    // Revit by default uses imperial units.
+                    if (userInfo.Thickness)
+                    {
+                        msg.Append(" " + LengthUnitConverter.ConvertToMetric(layer.Width, userInfo.UnitType, userInfo.Decimals).ToString());
+                    }
+                }
+
+                // Create Text Note options.
+                var textNoteOptions = new TextNoteOptions
+                {
+                    VerticalAlignment = VerticalTextAlignment.Top,
+                    HorizontalAlignment = HorizontalTextAlignment.Left,
+                    TypeId = userInfo.TextTypeId
+                };
+
+                // Open Revit document transaction to create new Text Note element.
+                using (var transaction = new Transaction(doc))
+                {
+                    transaction.Start("Tag Wall Layers Command");
+
+                    var pt = new XYZ();
+
+                    // Construct sketch plane for user to pick point if we are in elevation or section view.
+                    if (activeView.ViewType == ViewType.Elevation || activeView.ViewType == ViewType.Section)
+                    {
+                        var plane = Plane.CreateByNormalAndOrigin(activeView.ViewDirection, activeView.Origin);
+                        var sketchPlane = SketchPlane.Create(doc, plane);
+                        activeView.SketchPlane = sketchPlane;
+
+                        // Ask user to pick location point for the Text Note Element
+                        pt = uidoc.Selection.PickPoint("Pick text note location point");
+                    }
+                    else
+                    {
+                        // Ask user to pick location point for the Text Note Element
+                        pt = uidoc.Selection.PickPoint("Pick text note location point");
+                    }
+
+                    // Create Text Note with wall layers information on user specified point in the current active view.
+                    var textNote = TextNote.Create(doc, activeView.Id, pt, msg.ToString(), textNoteOptions);
+
+                    transaction.Commit();
+                }
             }
-
-            // Ask user to select one basic wall.
-            var selectionReference = uidoc.Selection.PickObject(ObjectType.Element, new SelectionFilterByCategory("Walls"), "Select one basic wall.");
-            var selectionElement = doc.GetElement(selectionReference);
-
-            // Cast generic element type to more specific Wall type.
-            var wall = selectionElement as Wall;
-
-            // Check if wall is type of basic wall.
-            if (wall.IsStackedWall)
+            catch (Autodesk.Revit.Exceptions.OperationCanceledException ex)
             {
-                Message.Display("Wall you selected is category of the Stacked Wall.\nIt's not supported by this command.", WindowType.Warning);
                 return Result.Cancelled;
             }
-
-            // Access list of wall layers.
-            var layers = wall.WallType.GetCompoundStructure().GetLayers();
-
-            // Get layer information in structured string format for Text Note.
-            var msg = new StringBuilder();
-
-            foreach (var layer in layers)
+            catch
             {
-                var material = doc.GetElement(layer.MaterialId) as Material;
-
-                msg.AppendLine();
-
-                if (userInfo.Function)
-                    msg.Append(layer.Function.ToString());
-
-                // Check if material is attached to the layer in wall compound structure.
-                if (userInfo.Name)
-                {
-                    if (material != null)
-                        msg.Append(" " + material.Name);
-                    else
-                        msg.Append("  <by category>");
-                }
-
-                // Convert units to metric.
-                // Revit by default uses imperial units.
-                if (userInfo.Thickness)
-                    msg.Append(" " + LengthUnitConverter.ConvertToMetric(layer.Width, userInfo.UnitType, userInfo.Decimals).ToString());
-            }
-
-            // Create Text Note options.
-            var textNoteOptions = new TextNoteOptions
-            {
-                VerticalAlignment = VerticalTextAlignment.Top,
-                HorizontalAlignment = HorizontalTextAlignment.Left,
-                TypeId = userInfo.TextTypeId
-            };
-
-            // Open Revit document transaction to create new Text Note element.
-            using (var transaction = new Transaction(doc))
-            {
-                transaction.Start("Tag Wall Layers Command");
-
-                var pt = new XYZ();
-
-                // Construct sketch plane for user to pick point if we are in elevation or section view.
-                if (activeView.ViewType == ViewType.Elevation || activeView.ViewType == ViewType.Section)
-                {
-                    var plane = Plane.CreateByNormalAndOrigin(activeView.ViewDirection, activeView.Origin);
-                    var sketchPlane = SketchPlane.Create(doc, plane);
-                    activeView.SketchPlane = sketchPlane;
-
-                    // Ask user to pick location point for the Text Note Element
-                    pt = uidoc.Selection.PickPoint("Pick text note location point");
-                }
-                else
-                {
-                    // Ask user to pick location point for the Text Note Element
-                    pt = uidoc.Selection.PickPoint("Pick text note location point");
-                }
-
-                // Create Text Note with wall layers information on user specified point in the current active view.
-                var textNote = TextNote.Create(doc, activeView.Id, pt, msg.ToString(), textNoteOptions);
-
-                transaction.Commit();
+                return Result.Failed;
             }
 
             return Result.Succeeded;
@@ -176,6 +194,6 @@
             return typeof(TagWallLayersCommand).Namespace + "." + nameof(TagWallLayersCommand);
         }
 
-        #endregion
+        #endregion public methods
     }
 }

@@ -11,12 +11,32 @@
     {
         #region private members
 
-        // Private variable that holds category name.
-        private string mCategory = "";
+        /// <summary>
+        ///  Private variable that holds category name.
+        /// </summary>
+        private string _mCategory;
 
-        #endregion
+        /// <summary>
+        /// 内置类型
+        /// </summary>
+        private BuiltInCategory _builtInCategory;
+
+        #endregion private members
 
         #region constructor
+
+        /// <summary>
+        /// 新增构造方法.
+        /// Initializes a new instance of the <see cref="SelectionFilterByCategory"/> class.
+        /// </summary>
+        /// <param name="builtInCategory">内置类型 如BuiltInCategory.OST_Walls</param>
+        /// <remarks>
+        /// 考虑直接使用Category名称会由于语言影响使用，故加此构造方法
+        /// </remarks>
+        public SelectionFilterByCategory(BuiltInCategory builtInCategory)
+        {
+            _builtInCategory = builtInCategory;
+        }
 
         /// <summary>
         /// default constrauctor.
@@ -25,10 +45,10 @@
         /// <param name="category">The category of element, suche as Walls, Floors,...</param>
         public SelectionFilterByCategory(string category)
         {
-            mCategory = category;
+            _mCategory = category;
         }
 
-        #endregion
+        #endregion constructor
 
         #region public methods
 
@@ -40,9 +60,15 @@
         /// <exception cref="System.NotImplementedException"></exception>
         public bool AllowElement(Element element)
         {
+            //有语言的影响
+            var builtInCategory = (BuiltInCategory)element.Category.Id.IntegerValue;
+
             // Check if category matches.
-            if (element.Category.Name == mCategory)
+            if (element.Category.Name == _mCategory
+                || builtInCategory == _builtInCategory)
+            {
                 return true;
+            }
 
             return false;
         }
@@ -59,6 +85,6 @@
             return false;
         }
 
-        #endregion
+        #endregion public methods
     }
 }
