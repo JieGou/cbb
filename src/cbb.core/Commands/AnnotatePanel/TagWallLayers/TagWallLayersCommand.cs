@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Globalization;
 
 namespace cbb.core
 {
@@ -131,7 +132,9 @@ namespace cbb.core
                     // Revit by default uses imperial units.
                     if (userInfo.Thickness)
                     {
-                        msg.Append(" " + LengthUnitConverter.ConvertToMetric(layer.Width, userInfo.UnitType, userInfo.Decimals).ToString());
+                        msg.Append(" " + LengthUnitConverter
+                                       .ConvertToMetric(layer.Width, userInfo.UnitType, userInfo.Decimals)
+                                       .ToString(CultureInfo.InvariantCulture));
                     }
                 }
 

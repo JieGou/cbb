@@ -1,4 +1,6 @@
-﻿namespace cbb.core
+﻿using System.ComponentModel;
+
+namespace cbb.core
 {
     /// <summary>
     /// Length unit type.
@@ -8,26 +10,31 @@
         /// <summary>
         /// The milimeter unit.
         /// </summary>
-        milimeter = 0,
+        [Description("毫米")]
+        Milimeter = 0,
 
         /// <summary>
         /// The centimeter unit.
         /// </summary>
-        centimeter = 1,
+        [Description("厘米")]
+        Centimeter = 1,
 
         /// <summary>
         /// The decimeter unit.
         /// </summary>
-        decimeter = 2,
+        [Description("分米")]
+        Decimeter = 2,
 
         /// <summary>
         /// The meter unit.
         /// </summary>
-        meter = 3,
+        [Description("米")]
+        Meter = 3,
 
         /// <summary>
         /// The kilometer unit.
         /// </summary>
-        kilometer = 4,
+        [Description("千米")]
+        Kilometer = 4,
     }
 }

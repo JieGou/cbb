@@ -1,4 +1,7 @@
-﻿using Itenso.Configuration;
+﻿using cbb.core.Helpers;
+using Itenso.Configuration;
+using System.ComponentModel;
+using System.Linq;
 
 namespace cbb.core
 {
@@ -29,7 +32,7 @@ namespace cbb.core
         /// <summary>
         /// The unit type to convert to.
         /// </summary>
-        private LengthUnitType unitType = LengthUnitType.milimeter;
+        private LengthUnitType unitType = LengthUnitType.Milimeter;
 
         /// <summary>
         /// The decimal places precision.
@@ -131,7 +134,9 @@ namespace cbb.core
         /// <param name="e">The <see cref="System.EventArgs"/> instance containing the event data.</param>
         private void cmbUnitType_SelectedIndexChanged(object sender, System.EventArgs e)
         {
-            unitType = (LengthUnitType)cmbUnitType.SelectedValue;
+            //unitType = (LengthUnitType)cmbUnitType.SelectedValue;
+            unitType = ((KeyValuePair<string, LengthUnitType>)cmbUnitType.SelectedItem).Value;
+            //
         }
 
         /// <summary>
@@ -202,7 +207,19 @@ namespace cbb.core
         private void PopulateUnitTypesList()
         {
             // Populate list from enum types.
-            cmbUnitType.DataSource = Enum.GetValues(typeof(LengthUnitType));
+            //cmbUnitType.DataSource = Enum.GetValues(typeof(LengthUnitType));
+
+            var list = new List<KeyValuePair<string, LengthUnitType>>();
+            foreach (LengthUnitType item in (LengthUnitType[])Enum.GetValues(typeof(LengthUnitType)))
+            {
+                list.Add(new KeyValuePair<string, LengthUnitType>
+                    (item.GetAttributeOfType<DescriptionAttribute>().Description,
+                    item));
+            }
+
+            cmbUnitType.DataSource = new BindingSource(list, null);
+            cmbUnitType.DisplayMember = "Key";
+            cmbUnitType.ValueMember = "Value";
         }
 
         /// <summary>
