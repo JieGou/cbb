@@ -1,9 +1,8 @@
 ﻿namespace cbb
 {
     using Autodesk.Revit.UI;
-
-    using ui;
     using core;
+    using ui;
 
     /// <summary>
     /// Setup whole plugins interface with tabs, panels, buttons,...
@@ -18,10 +17,9 @@
         /// </summary>
         public SetupInterface()
         {
-
         }
 
-        #endregion
+        #endregion constructor
 
         #region public methods
 
@@ -36,13 +34,13 @@
             app.CreateRibbonTab(tabName);
 
             // Create the ribbon panels.
-            var annotateCommandsPanel =  app.CreateRibbonPanel(tabName, "Annotation Commands");
+            var annotateCommandsPanel = app.CreateRibbonPanel(tabName, "Annotation Commands");
             var managerCommandsPanel = app.CreateRibbonPanel(tabName, "Family Manager Commands");
 
             #region annotate
 
             // Populate button data model.
-            var TagWallButtonData = new RevitPushButtonDataModel
+            var tagWallButtonData = new RevitPushButtonDataModel
             {
                 Label = "Tag Wall\nLayers",
                 Panel = annotateCommandsPanel,
@@ -53,9 +51,9 @@
             };
 
             // Create button from provided data.
-            var TagWallButton = RevitPushButton.Create(TagWallButtonData);
+            PushButton tagWallButton = RevitPushButton.Create(tagWallButtonData);
 
-            #endregion
+            #endregion annotate
 
             #region manager
 
@@ -79,11 +77,11 @@
                 IconImageName = "icon_HideFamilyManager_32x32.png",
                 TooltipImageName = "tooltip_HideFamilyManager_320x320.png"
             };
-            var familyManagerHideButton = RevitPushButton.Create(familyManagerHideButtonData);
+            PushButton familyManagerHideButton = RevitPushButton.Create(familyManagerHideButtonData);
 
-            #endregion
+            #endregion manager
         }
 
-        #endregion
+        #endregion public methods
     }
 }
