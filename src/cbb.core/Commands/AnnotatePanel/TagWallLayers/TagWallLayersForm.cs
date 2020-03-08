@@ -1,4 +1,6 @@
-﻿namespace cbb.core
+﻿using Itenso.Configuration;
+
+namespace cbb.core
 {
     using Autodesk.Revit.DB;
     using Autodesk.Revit.UI;
@@ -34,6 +36,12 @@
         /// </summary>
         private int decimals = 1;
 
+        #region 为保存界面值增加的字段
+
+        private readonly FormSettings formSettings;
+
+        #endregion 为保存界面值增加的字段
+
         #endregion private members
 
         #region constructor
@@ -47,6 +55,20 @@
         {
             InitializeComponent();
             uidoc = uIDocument;
+
+            //界面设置
+            formSettings = new FormSettings(this)
+            {
+                //设置的自动保存为否
+                SaveOnClose = false
+            };
+            //ComboBox列表项
+            formSettings.SettingCollectors.Add(new PropertySettingCollector(
+                this, typeof(System.Windows.Forms.ComboBox), "SelectedIndex"));
+
+            //所有的CheckBox控件保存到配置文件中
+            formSettings.SettingCollectors.Add(new PropertySettingCollector(this,
+                typeof(CheckBox), "Checked"));
         }
 
         #endregion constructor
@@ -61,6 +83,9 @@
         private void btnOk_Click(object sender, System.EventArgs e)
         {
             this.DialogResult = DialogResult.OK;
+
+            //保存界面设置值
+            formSettings.Save();
             Close();
         }
 
