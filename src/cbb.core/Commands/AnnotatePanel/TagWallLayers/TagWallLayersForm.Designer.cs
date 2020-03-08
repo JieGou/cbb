@@ -91,6 +91,7 @@
             // 
             // cmbTextNoteElementType
             // 
+            this.cmbTextNoteElementType.DropDownStyle = System.Windows.Forms.ComboBoxStyle.DropDownList;
             this.cmbTextNoteElementType.FormattingEnabled = true;
             this.cmbTextNoteElementType.Location = new System.Drawing.Point(6, 111);
             this.cmbTextNoteElementType.Name = "cmbTextNoteElementType";
@@ -158,6 +159,7 @@
             // 
             // cmbDecimalPlaces
             // 
+            this.cmbDecimalPlaces.DropDownStyle = System.Windows.Forms.ComboBoxStyle.DropDownList;
             this.cmbDecimalPlaces.FormattingEnabled = true;
             this.cmbDecimalPlaces.Location = new System.Drawing.Point(9, 86);
             this.cmbDecimalPlaces.Name = "cmbDecimalPlaces";
@@ -176,6 +178,7 @@
             // 
             // cmbUnitType
             // 
+            this.cmbUnitType.DropDownStyle = System.Windows.Forms.ComboBoxStyle.DropDownList;
             this.cmbUnitType.FormattingEnabled = true;
             this.cmbUnitType.Location = new System.Drawing.Point(9, 39);
             this.cmbUnitType.Name = "cmbUnitType";

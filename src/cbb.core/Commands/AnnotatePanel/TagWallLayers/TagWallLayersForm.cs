@@ -86,6 +86,7 @@ namespace cbb.core
 
             //保存界面设置值
             formSettings.Save();
+
             Close();
         }
 

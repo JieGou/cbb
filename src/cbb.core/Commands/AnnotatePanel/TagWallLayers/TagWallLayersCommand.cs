@@ -156,15 +156,9 @@ namespace cbb.core
                         var plane = Plane.CreateByNormalAndOrigin(activeView.ViewDirection, activeView.Origin);
                         var sketchPlane = SketchPlane.Create(doc, plane);
                         activeView.SketchPlane = sketchPlane;
-
-                        // Ask user to pick location point for the Text Note Element
-                        pt = uidoc.Selection.PickPoint("Pick text note location point");
                     }
-                    else
-                    {
-                        // Ask user to pick location point for the Text Note Element
-                        pt = uidoc.Selection.PickPoint("Pick text note location point");
-                    }
+                    // Ask user to pick location point for the Text Note Element
+                    pt = uidoc.Selection.PickPoint("Pick text note location point");
 
                     // Create Text Note with wall layers information on user specified point in the current active view.
                     var textNote = TextNote.Create(doc, activeView.Id, pt, msg.ToString(), textNoteOptions);
