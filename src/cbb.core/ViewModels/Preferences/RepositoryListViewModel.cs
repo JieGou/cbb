@@ -1,12 +1,13 @@
 ﻿namespace cbb.core
 {
+    using GalaSoft.MvvmLight;
     using System.Collections.ObjectModel;
 
     /// <summary>
     /// Repository list view model for list view in ui control.
     /// </summary>
     /// <seealso cref="cbb.core.BaseViewModel" />
-    public class RepositoryListViewModel : BaseViewModel
+    public class RepositoryListViewModel : ViewModelBase
     {
         #region public properties
 
@@ -16,9 +17,39 @@
         /// <value>
         /// The repository.
         /// </value>
-        public ObservableCollection<RepositoryItem> Repository { get; set; }
+        //public ObservableCollection<RepositoryItem> Repository { get; set; }
 
-        #endregion
+        /// <summary>
+        /// The <see cref="Repository" /> property's name.
+        /// </summary>
+        public const string RepositoryPropertyName = "Repository";
+
+        private ObservableCollection<RepositoryItem> _repository;
+
+        /// <summary>
+        /// Sets and gets the Repository property.
+        /// Changes to that property's value raise the PropertyChanged event.
+        /// </summary>
+        public ObservableCollection<RepositoryItem> Repository
+        {
+            get
+            {
+                return _repository;
+            }
+
+            set
+            {
+                if (_repository == value)
+                {
+                    return;
+                }
+
+                _repository = value;
+                RaisePropertyChanged(RepositoryPropertyName);
+            }
+        }
+
+        #endregion public properties
 
         #region constructor
 
@@ -32,7 +63,7 @@
             Repository = GetRepositories();
         }
 
-        #endregion
+        #endregion constructor
 
         #region private methods
 
@@ -61,6 +92,6 @@
             return items;
         }
 
-        #endregion
+        #endregion private methods
     }
 }

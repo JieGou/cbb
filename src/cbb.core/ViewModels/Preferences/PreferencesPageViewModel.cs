@@ -27,7 +27,7 @@
         /// </value>
         public ICommand RemoveRepositoryCommand { get; set; }
 
-        #endregion
+        #endregion commands
 
         #region constructor
 
@@ -42,7 +42,7 @@
             RemoveRepositoryCommand = new RouteCommands(RemoveRepositoryCmdFunc);
         }
 
-        #endregion
+        #endregion constructor
 
         #region private methods
 
@@ -60,7 +60,7 @@
                 {
                     path = dialog.SelectedPath;
                     // Load exsisting data.
-                    var prefs = Preferences.Load();
+                    Preferences prefs = Preferences.Load();
                     // Add selected path and save it in serialized structure data file.
                     prefs.Repository.Add(path);
                     prefs.Save();
@@ -81,6 +81,6 @@
             Message.Display("remove repository", WindowType.Information);
         }
 
-        #endregion
+        #endregion private methods
     }
 }

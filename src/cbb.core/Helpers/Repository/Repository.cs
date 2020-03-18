@@ -24,7 +24,7 @@
                     path = dialog.SelectedPath;
 
                     // Load exsisting data.
-                    var prefs = Preferences.Load();
+                    Preferences prefs = Preferences.Load();
                     // Add selected path and save it in serialized strecture data file.
                     prefs.Repository.Add(path);
                     prefs.Save();
@@ -39,9 +39,8 @@
                     return;
                 }
             }
-            
         }
 
-        #endregion
+        #endregion public methods
     }
 }

@@ -1,13 +1,14 @@
 ﻿namespace cbb.core
 {
+    using GalaSoft.MvvmLight;
+    using System.Collections.Generic;
     using System.IO;
     using System.Xml.Serialization;
-    using System.Collections.Generic;
 
     /// <summary>
     /// Preferences options stored in this data model.
     /// </summary>
-    public class Preferences
+    public class Preferences : ViewModelBase
     {
         #region private members
 
@@ -16,7 +17,7 @@
         /// </summary>
         private string file = "prefs.cbb";
 
-        #endregion
+        #endregion private members
 
         #region public properties
 
@@ -26,9 +27,36 @@
         /// <value>
         /// The repository directories.
         /// </value>
-        public List<string> Repository { get; set; }
+        //public List<string> Repository { get; set; }
 
-        #endregion
+        /// <summary>
+        /// The <see cref="Repository" /> property's name.
+        /// </summary>
+        public const string RepositoryPropertyName = "Repository";
+
+        private List<string> _repository;
+
+        /// <summary>
+        /// Sets and gets the Repository property.
+        /// Changes to that property's value raise the PropertyChanged event.
+        /// </summary>
+        public List<string> Repository
+        {
+            get => _repository;
+
+            set
+            {
+                if (_repository == value)
+                {
+                    return;
+                }
+
+                _repository = value;
+                RaisePropertyChanged(RepositoryPropertyName);
+            }
+        }
+
+        #endregion public properties
 
         #region constructor
 
@@ -38,10 +66,9 @@
         /// </summary>
         public Preferences()
         {
-
         }
 
-        #endregion
+        #endregion constructor
 
         #region public methods
 
@@ -58,6 +85,8 @@
                 // Serialize state of the object in the file.
                 var serializer = new XmlSerializer(typeof(Preferences));
                 serializer.Serialize(stream, this);
+
+                this.RaisePropertyChanged(RepositoryPropertyName);
             }
         }
 
@@ -73,10 +102,12 @@
             {
                 // Loads saved serialized data and return it as Preferences object.
                 var deserializer = new XmlSerializer(typeof(Preferences));
-                return (Preferences)deserializer.Deserialize(stream);
+                var preferences = (Preferences)deserializer.Deserialize(stream);
+
+                return preferences;
             }
         }
 
-        #endregion
+        #endregion public methods
     }
 }
